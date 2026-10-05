@@ -1,0 +1,1947 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+<title>Managementy — ХӨУБ нэгдсэн удирдлагын платформ</title>
+<style>
+/* ============ RESET & VARIABLES ============ */
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --accent:265;
+  --bg:#05060a;
+  --text:#eef1ff;
+  --muted:rgba(238,241,255,.6);
+  --glass:rgba(255,255,255,.07);
+  --glass2:rgba(255,255,255,.045);
+  --brd:rgba(255,255,255,.16);
+  --shadow:0 12px 40px rgba(0,0,0,.45);
+  --radius:20px;
+}
+body[data-theme="light"]{
+  --bg:#e9edf7;
+  --text:#0d1024;
+  --muted:rgba(13,16,36,.6);
+  --glass:rgba(255,255,255,.6);
+  --glass2:rgba(255,255,255,.42);
+  --brd:rgba(255,255,255,.85);
+  --shadow:0 12px 40px rgba(60,70,120,.18);
+}
+html,body{height:100%}
+body{
+  font-family:'Segoe UI',system-ui,-apple-system,"Helvetica Neue",sans-serif;
+  background:var(--bg);color:var(--text);
+  min-height:100vh;overflow-x:hidden;
+  transition:background .4s ease,color .3s ease;
+  -webkit-font-smoothing:antialiased;
+}
+::-webkit-scrollbar{width:9px;height:9px}
+::-webkit-scrollbar-thumb{background:rgba(150,150,200,.35);border-radius:9px}
+::-webkit-scrollbar-track{background:transparent}
+
+/* ============ AURA GRADIENT BACKGROUND ============ */
+.aura{position:fixed;inset:0;z-index:-2;overflow:hidden;background:var(--bg);transition:background .4s}
+.aura i{
+  position:absolute;display:block;border-radius:50%;
+  filter:blur(100px);opacity:.72;mix-blend-mode:screen;
+  animation:drift 26s ease-in-out infinite;
+  will-change:transform;
+}
+body[data-theme="light"] .aura i{mix-blend-mode:normal;opacity:.55;filter:blur(95px)}
+.aura i:nth-child(1){width:58vw;height:58vw;left:-14vw;top:-14vw;background:radial-gradient(circle at 35% 35%,hsl(var(--accent) 92% 62%),transparent 68%);animation-delay:0s}
+.aura i:nth-child(2){width:52vw;height:52vw;right:-12vw;top:-8vw;background:radial-gradient(circle at 60% 40%,#00e0ff,transparent 68%);animation-delay:-6s}
+.aura i:nth-child(3){width:60vw;height:60vw;left:20vw;bottom:-26vw;background:radial-gradient(circle at 50% 50%,#ff3fa4,transparent 68%);animation-delay:-12s}
+.aura i:nth-child(4){width:44vw;height:44vw;right:2vw;bottom:-14vw;background:radial-gradient(circle at 50% 50%,#ffb020,transparent 68%);animation-delay:-18s}
+.aura i:nth-child(5){width:46vw;height:46vw;left:38vw;top:12vh;background:radial-gradient(circle at 50% 50%,#28e07a,transparent 70%);animation-delay:-9s}
+@keyframes drift{
+  0%,100%{transform:translate(0,0) scale(1)}
+  25%{transform:translate(7vw,5vh) scale(1.14)}
+  50%{transform:translate(-5vw,8vh) scale(.92)}
+  75%{transform:translate(4vw,-6vh) scale(1.08)}
+}
+
+/* ============ GLASS ============ */
+.glass{
+  background:var(--glass);
+  backdrop-filter:blur(22px) saturate(170%);
+  -webkit-backdrop-filter:blur(22px) saturate(170%);
+  border:1px solid var(--brd);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow), inset 0 1px 0 rgba(255,255,255,.20);
+}
+.card{padding:20px}
+.strong{font-weight:700}
+.muted{color:var(--muted)}
+.small{font-size:12.5px}
+.center{text-align:center}
+.row{display:flex;gap:12px;flex-wrap:wrap}
+.row>*{flex:1;min-width:130px}
+.spacer{flex:1}
+
+/* ============ BUTTONS / INPUTS ============ */
+.btn{
+  padding:11px 18px;border-radius:14px;border:none;cursor:pointer;
+  font-weight:650;font-size:14px;font-family:inherit;color:var(--text);
+  background:rgba(255,255,255,.10);border:1px solid var(--brd);
+  transition:.2s;display:inline-flex;align-items:center;gap:8px;justify-content:center;
+}
+.btn:hover{transform:translateY(-2px);background:rgba(255,255,255,.18)}
+.btn:active{transform:translateY(0)}
+.btn.primary{
+  background:linear-gradient(135deg,hsl(var(--accent) 92% 60%),hsl(calc(var(--accent) + 70) 92% 58%));
+  border:none;color:#fff;
+  box-shadow:0 8px 26px hsl(var(--accent) 90% 55% / .45);
+}
+.btn.primary:hover{box-shadow:0 12px 32px hsl(var(--accent) 90% 55% / .6)}
+.btn.danger{background:linear-gradient(135deg,#ff4d6d,#c9184a);border:none;color:#fff}
+.btn.ok{background:linear-gradient(135deg,#22c55e,#0f9d58);border:none;color:#fff}
+.btn.sm{padding:7px 12px;font-size:12.5px;border-radius:11px}
+.icon-btn{
+  width:40px;height:40px;border-radius:13px;border:1px solid var(--brd);
+  background:rgba(255,255,255,.09);color:var(--text);cursor:pointer;font-size:17px;
+  display:grid;place-items:center;transition:.2s;font-family:inherit;
+}
+.icon-btn:hover{background:rgba(255,255,255,.18)}
+input,select,textarea{
+  width:100%;padding:12px 14px;border-radius:13px;font-family:inherit;font-size:14px;
+  background:rgba(255,255,255,.08);border:1px solid var(--brd);color:var(--text);
+  margin-top:6px;outline:none;transition:.2s;
+}
+body[data-theme="light"] input,body[data-theme="light"] select,body[data-theme="light"] textarea{background:rgba(255,255,255,.75)}
+input:focus,select:focus,textarea:focus{border-color:hsl(var(--accent) 90% 65%);box-shadow:0 0 0 3px hsl(var(--accent) 90% 60% / .22)}
+textarea{resize:vertical;min-height:88px}
+label{display:block;font-size:13px;color:var(--muted);margin-bottom:12px;font-weight:600}
+select option{background:#141528;color:#fff}
+body[data-theme="light"] select option{background:#fff;color:#111}
+
+/* ============ AUTH ============ */
+.auth-wrap{min-height:100vh;display:grid;place-items:center;padding:22px}
+.auth-card{width:min(460px,100%);padding:30px 26px}
+.brand-big{
+  font-size:30px;font-weight:800;letter-spacing:-.6px;text-align:center;
+  background:linear-gradient(120deg,hsl(var(--accent) 95% 70%),#00e0ff,#ff3fa4);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.tabs{display:flex;gap:6px;background:rgba(255,255,255,.07);border:1px solid var(--brd);border-radius:15px;padding:5px;margin:20px 0 14px}
+.tab{flex:1;padding:10px 6px;border-radius:11px;border:none;background:transparent;color:var(--muted);font-weight:650;font-size:13px;cursor:pointer;font-family:inherit;transition:.2s}
+.tab.active{background:rgba(255,255,255,.16);color:var(--text);box-shadow:0 4px 14px rgba(0,0,0,.18)}
+.link-btn{background:none;border:none;color:var(--muted);font-size:12.5px;cursor:pointer;width:100%;margin-top:16px;font-family:inherit;text-decoration:underline;text-underline-offset:3px}
+.link-btn:hover{color:var(--text)}
+
+/* ============ SHELL ============ */
+.topbar{
+  position:sticky;top:10px;z-index:30;display:flex;align-items:center;gap:12px;
+  padding:10px 14px;margin:10px 14px 0;border-radius:18px;
+}
+.brand{font-weight:800;font-size:17px;letter-spacing:-.3px;
+  background:linear-gradient(120deg,hsl(var(--accent) 95% 72%),#00e0ff);
+  -webkit-background-clip:text;background-clip:text;color:transparent}
+.chip{padding:7px 14px;border-radius:999px;background:rgba(255,255,255,.10);border:1px solid var(--brd);font-size:12.5px;font-weight:650;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+.drawer{
+  position:fixed;left:0;top:0;bottom:0;width:282px;z-index:60;
+  padding:20px 16px;overflow-y:auto;
+  border-radius:0 26px 26px 0;
+  transform:translateX(-106%);transition:transform .36s cubic-bezier(.4,0,.2,1);
+  display:flex;flex-direction:column;gap:16px;
+}
+.drawer.open{transform:none}
+.drawer-head{display:flex;gap:12px;align-items:center;padding:4px 4px 14px;border-bottom:1px solid var(--brd)}
+.avatar{
+  width:46px;height:46px;border-radius:15px;flex-shrink:0;display:grid;place-items:center;
+  font-weight:800;font-size:19px;color:#fff;
+  background:linear-gradient(135deg,hsl(var(--accent) 90% 60%),hsl(calc(var(--accent) + 80) 90% 58%));
+}
+.nav{display:flex;flex-direction:column;gap:5px;flex:1}
+.nav-item{
+  display:flex;align-items:center;gap:11px;padding:11px 13px;border-radius:13px;
+  border:1px solid transparent;background:transparent;color:var(--text);
+  font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;text-align:left;transition:.18s;
+}
+.nav-item span{font-size:16px;width:22px;text-align:center}
+.nav-item:hover{background:rgba(255,255,255,.10)}
+.nav-item.active{
+  background:linear-gradient(120deg,hsl(var(--accent) 90% 60% / .32),hsl(calc(var(--accent) + 80) 90% 60% / .18));
+  border-color:hsl(var(--accent) 90% 65% / .45);
+}
+.scrim{position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(3px);z-index:55;opacity:0;pointer-events:none;transition:.3s}
+.scrim.show{opacity:1;pointer-events:auto}
+
+.main{padding:20px 16px 90px;max-width:1180px;margin:0 auto;width:100%}
+@media(min-width:1024px){
+  .drawer{transform:none}
+  .scrim{display:none!important}
+  #burger{display:none}
+  .main{margin-left:282px;max-width:1180px;padding:20px 26px 80px}
+}
+.page-head{display:flex;align-items:flex-end;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:18px}
+.page-head h2{font-size:22px;letter-spacing:-.4px}
+.page-head p{font-size:13px;margin-top:3px}
+
+.grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(260px,1fr))}
+.stat{padding:18px}
+.stat .num{font-size:28px;font-weight:800;letter-spacing:-1px}
+.stat .lbl{font-size:12.5px;color:var(--muted);font-weight:600;margin-top:2px}
+
+.item{
+  padding:16px;border-radius:17px;background:var(--glass2);border:1px solid var(--brd);
+  transition:.2s;cursor:pointer;
+}
+.item:hover{transform:translateY(-3px);background:rgba(255,255,255,.10)}
+.item h4{font-size:15px;margin-bottom:6px}
+.badge{display:inline-block;padding:4px 11px;border-radius:999px;font-size:11px;font-weight:700;
+  background:rgba(255,255,255,.12);border:1px solid var(--brd)}
+.badge.green{background:rgba(34,197,94,.22);border-color:rgba(34,197,94,.4);color:#7dffb0}
+.badge.red{background:rgba(255,77,109,.22);border-color:rgba(255,77,109,.4);color:#ff9db2}
+.badge.amber{background:rgba(255,176,32,.22);border-color:rgba(255,176,32,.4);color:#ffd479}
+.badge.blue{background:rgba(0,180,255,.22);border-color:rgba(0,180,255,.4);color:#8fe4ff}
+
+/* ============ CALENDAR ============ */
+.cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.cal-dow{text-align:center;font-size:11.5px;font-weight:700;color:var(--muted);padding:6px 0}
+.cal-day{
+  aspect-ratio:1/.92;border-radius:13px;border:1px solid transparent;
+  background:rgba(255,255,255,.05);display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:3px;cursor:pointer;
+  font-size:13.5px;font-weight:600;transition:.18s;padding:4px;
+}
+.cal-day:hover{background:rgba(255,255,255,.14);transform:scale(1.05)}
+.cal-day.empty{background:transparent;cursor:default;pointer-events:none}
+.cal-day.today{border-color:hsl(var(--accent) 90% 62%);box-shadow:0 0 0 2px hsl(var(--accent) 90% 60% / .28)}
+.cal-day.has-ev{background:linear-gradient(140deg,hsl(var(--accent) 90% 60% / .34),hsl(calc(var(--accent) + 80) 90% 60% / .2))}
+.dot{width:5px;height:5px;border-radius:50%;background:#fff;opacity:.9}
+
+/* ============ CHAT ============ */
+.chat-wrap{display:flex;flex-direction:column;height:calc(100vh - 190px);min-height:380px}
+.chat-msgs{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:10px;padding:14px}
+.msg{max-width:78%;padding:10px 14px;border-radius:16px;background:rgba(255,255,255,.09);border:1px solid var(--brd);font-size:14px;word-break:break-word}
+.msg.me{align-self:flex-end;background:linear-gradient(135deg,hsl(var(--accent) 90% 58% / .55),hsl(calc(var(--accent) + 70) 90% 55% / .38));border-color:hsl(var(--accent) 90% 65% / .5)}
+.msg .who{font-size:11.5px;font-weight:750;opacity:.85;margin-bottom:4px}
+.msg .tm{font-size:10.5px;opacity:.6;margin-top:5px;text-align:right}
+.msg img{max-width:100%;border-radius:12px;margin-top:6px;display:block}
+.msg a.file{display:flex;align-items:center;gap:8px;margin-top:6px;color:inherit;text-decoration:underline}
+.chat-input{display:flex;gap:8px;padding:12px;border-top:1px solid var(--brd);align-items:center;flex-wrap:wrap}
+.chat-input input[type=text]{margin-top:0;flex:1;min-width:120px}
+.room-tabs{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+
+/* ============ MODAL ============ */
+.modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.62);backdrop-filter:blur(6px);z-index:200;display:grid;place-items:center;padding:16px;animation:fade .22s ease}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.modal{width:min(600px,100%);max-height:88vh;display:flex;flex-direction:column;animation:pop .26s cubic-bezier(.34,1.4,.64,1)}
+@keyframes pop{from{transform:scale(.92) translateY(14px);opacity:0}to{transform:none;opacity:1}}
+.modal-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 20px;border-bottom:1px solid var(--brd)}
+.modal-head h3{font-size:17px}
+.modal-body{padding:18px 20px;overflow-y:auto;flex:1}
+.modal-foot{padding:14px 20px;border-top:1px solid var(--brd);display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap}
+
+/* ============ TOAST ============ */
+.toast-root{position:fixed;bottom:22px;right:22px;z-index:400;display:flex;flex-direction:column;gap:9px;align-items:flex-end}
+.toast{
+  padding:13px 18px;border-radius:14px;font-size:13.5px;font-weight:650;
+  background:rgba(20,22,40,.92);backdrop-filter:blur(16px);
+  border:1px solid var(--brd);box-shadow:var(--shadow);
+  transition:.3s;color:#fff;max-width:330px;animation:slidein .3s ease;
+}
+.toast.ok{border-color:rgba(34,197,94,.55)}
+.toast.err{border-color:rgba(255,77,109,.55)}
+@keyframes slidein{from{transform:translateX(40px);opacity:0}to{transform:none;opacity:1}}
+
+.empty{padding:40px 20px;text-align:center;color:var(--muted);font-size:14px}
+.code-pill{
+  display:inline-flex;align-items:center;gap:8px;padding:6px 12px;border-radius:11px;
+  background:rgba(255,255,255,.10);border:1px dashed var(--brd);
+  font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px;font-weight:700;letter-spacing:.6px;
+  cursor:pointer;transition:.2s;
+}
+.code-pill:hover{background:rgba(255,255,255,.2)}
+.list{display:flex;flex-direction:column;gap:10px}
+.divider{height:1px;background:var(--brd);margin:16px 0}
+</style>
+</head>
+<body data-theme="dark">
+<div class="aura"><i></i><i></i><i></i><i></i><i></i></div>
+<div id="root"></div>
+<div id="modalRoot"></div>
+<div id="toastRoot" class="toast-root"></div>
+
+<script type="module">
+/* ================================================================
+   FIREBASE
+   ================================================================ */
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js";
+import {
+  getDatabase, ref, set, get, push, update, remove, onValue
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAuohMQKpgnt_QwDLA-F85vfcupml-ZK_0",
+  authDomain: "managre-40f52.firebaseapp.com",
+  databaseURL: "https://managre-40f52-default-rtdb.firebaseio.com",
+  projectId: "managre-40f52",
+  storageBucket: "managre-40f52.firebasestorage.app",
+  messagingSenderId: "985274672567",
+  appId: "1:985274672567:web:838be4805d194c91d27432",
+  measurementId: "G-R93H7LDZSW"
+};
+
+const app = initializeApp(firebaseConfig);
+try { getAnalytics(app); } catch (e) { /* analytics optional */ }
+const db = getDatabase(app);
+
+/* ================================================================
+   HELPERS
+   ================================================================ */
+const rootEl   = document.getElementById('root');
+const modalEl  = document.getElementById('modalRoot');
+const toastEl  = document.getElementById('toastRoot');
+const $  = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+
+const esc = s => String(s ?? '').replace(/[&<>"']/g,
+  c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+
+const uid = () => Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
+
+function toast(msg, type = 'ok') {
+  const t = document.createElement('div');
+  t.className = 'toast ' + type;
+  t.textContent = msg;
+  toastEl.appendChild(t);
+  setTimeout(() => {
+    t.style.opacity = '0';
+    t.style.transform = 'translateX(40px)';
+    setTimeout(() => t.remove(), 300);
+  }, 3000);
+}
+
+function openModal(title, bodyHTML, footHTML = '') {
+  modalEl.innerHTML = `
+    <div class="modal-backdrop" data-close>
+      <div class="modal glass" onclick="event.stopPropagation()">
+        <div class="modal-head">
+          <h3>${title}</h3>
+          <button class="icon-btn" data-close>✕</button>
+        </div>
+        <div class="modal-body">${bodyHTML}</div>
+        ${footHTML ? `<div class="modal-foot">${footHTML}</div>` : ''}
+      </div>
+    </div>`;
+  $$('[data-close]', modalEl).forEach(b => b.addEventListener('click', closeModal));
+}
+function closeModal() { modalEl.innerHTML = ''; }
+
+function fileToDataURL(file) {
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload = () => res(r.result);
+    r.onerror = rej;
+    r.readAsDataURL(file);
+  });
+}
+
+function fmtDate(ts) {
+  if (!ts) return '—';
+  const d = new Date(ts);
+  return d.toLocaleDateString('mn-MN', { year:'numeric', month:'2-digit', day:'2-digit' });
+}
+function fmtTime(ts) {
+  if (!ts) return '';
+  return new Date(ts).toLocaleTimeString('mn-MN', { hour:'2-digit', minute:'2-digit' });
+}
+function todayISO() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+
+function randCode(prefix) {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let s = '';
+  for (let i = 0; i < 4; i++) s += chars[Math.floor(Math.random() * chars.length)];
+  return prefix + '-' + s;
+}
+async function uniqueCode(prefix) {
+  for (let i = 0; i < 25; i++) {
+    const c = randCode(prefix);
+    const snap = await get(ref(db, 'codes/' + c));
+    if (!snap.exists()) return c;
+  }
+  throw new Error('Код үүсгэж чадсангүй');
+}
+
+/* ================================================================
+   STATE
+   ================================================================ */
+const state = {
+  user: null,          // {role, clubId, memberId, name, email, code, full}
+  view: 'dashboard',
+  chatRoom: 'club',
+  calCursor: new Date(),
+  unsubs: []
+};
+
+function saveSession() {
+  if (state.user) localStorage.setItem('mgmt_session', JSON.stringify(state.user));
+  else localStorage.removeItem('mgmt_session');
+}
+function clearUnsubs() { state.unsubs.forEach(u => { try { u(); } catch(e){} }); state.unsubs = []; }
+
+const isAdmin   = () => state.user && (state.user.role === 'admin' || state.user.full === true);
+const isLeader  = () => state.user && state.user.role === 'leader';
+const canManage = () => isAdmin() || isLeader();
+
+function roleLabel(r) {
+  return r === 'admin' ? 'Нийгмийн ажилтан · Бүтэн эрх'
+       : r === 'leader' ? 'Клубын тэргүүн'
+       : 'Гишүүн';
+}
+
+/* ================================================================
+   THEME
+   ================================================================ */
+function applyTheme() {
+  const th  = localStorage.getItem('mgmt_theme')  || 'dark';
+  const acc = localStorage.getItem('mgmt_accent') || '265';
+  document.body.dataset.theme = th;
+  document.documentElement.style.setProperty('--accent', acc);
+}
+applyTheme();
+
+/* ================================================================
+   AUTH SCREEN
+   ================================================================ */
+function renderAuth(mode = 'login') {
+  rootEl.innerHTML = `
+  <div class="auth-wrap">
+    <div class="auth-card glass">
+      <div class="brand-big">Managementy</div>
+      <p class="muted center small" style="margin-top:8px">
+        Клуб & Хүүхдийн өөрөө удирдлагын байгууллагын<br>нэгдсэн удирдлагын платформ
+      </p>
+
+      <div class="tabs">
+        <button class="tab ${mode==='login'?'active':''}"    data-mode="login">Нэвтрэх</button>
+        <button class="tab ${mode==='register'?'active':''}" data-mode="register">Бүртгүүлэх</button>
+        <button class="tab ${mode==='leader'?'active':''}"   data-mode="leader">Тэргүүн</button>
+      </div>
+
+      <form id="authForm" autocomplete="off">
+        ${mode === 'login' ? `
+          <label>Имэйл
+            <input name="email" type="email" required placeholder="you@example.com">
+          </label>
+          <label>Клуб эсвэл гишүүний код
+            <input name="code" required placeholder="CLUB-XXXX / MNG-XXXX"
+                   style="text-transform:uppercase" autocomplete="off">
+          </label>
+          <button class="btn primary" style="width:100%;margin-top:6px" type="submit">Нэвтрэх</button>
+        ` : ''}
+
+        ${mode === 'register' ? `
+          <label>Гишүүний код (Тэргүүнээс авна)
+            <input name="code" required placeholder="MNG-XXXX"
+                   style="text-transform:uppercase" autocomplete="off">
+          </label>
+          <label>Имэйл
+            <input name="email" type="email" required placeholder="you@example.com">
+          </label>
+          <button class="btn primary" style="width:100%;margin-top:6px" type="submit">Бүртгүүлэх</button>
+          <p class="muted small center" style="margin-top:12px">
+            Гишүүн заавал хаяг үүсгэх шаардлагагүй — зөвхөн кодоо бичээд нэвтэрч болно.
+          </p>
+        ` : ''}
+
+        ${mode === 'leader' ? `
+          <div class="row">
+            <label>Нэр<input name="name" required></label>
+            <label>Овог<input name="lastname" required></label>
+          </div>
+          <label>Имэйл<input name="email" type="email" required></label>
+          <label>Утас<input name="phone" required placeholder="99112233"></label>
+          <label>Клубын нэр<input name="clubName" required placeholder="Жишээ: Эко клуб"></label>
+          <label>Бүтэц<input name="structure" placeholder="12 гишүүн, 3 баг"></label>
+          <label>Сургууль<input name="school" required placeholder="Жишээ: 33-р сургууль"></label>
+          <button class="btn primary" style="width:100%;margin-top:6px" type="submit">
+            Клуб бүртгэх & Код авах
+          </button>
+        ` : ''}
+      </form>
+
+      <button class="link-btn" id="socialBtn">🔒 Нийгмийн ажилтны нэвтрэх / бүртгүүлэх</button>
+    </div>
+  </div>`;
+
+  $$('.tab', rootEl).forEach(t => t.onclick = () => renderAuth(t.dataset.mode));
+  $('#authForm').onsubmit = e => { e.preventDefault(); handleAuth(mode, e.target); };
+  $('#socialBtn').onclick = socialWorkerModal;
+}
+
+async function handleAuth(mode, form) {
+  const fd = Object.fromEntries(new FormData(form));
+  const btn = form.querySelector('button[type=submit]');
+  const old = btn.textContent;
+  btn.disabled = true; btn.textContent = 'Түр хүлээнэ үү...';
+
+  try {
+    if (mode === 'login')    await doLogin(fd.email.trim(), fd.code.trim().toUpperCase());
+    if (mode === 'register') await doRegister(fd.code.trim().toUpperCase(), fd.email.trim());
+    if (mode === 'leader')   await doLeaderRegister(fd);
+  } catch (err) {
+    toast(err.message || 'Алдаа гарлаа', 'err');
+  } finally {
+    btn.disabled = false; btn.textContent = old;
+  }
+}
+
+/* ---------- LOGIN ---------- */
+async function doLogin(email, code) {
+  if (!email || !code) throw new Error('Имэйл болон кодоо оруулна уу');
+
+  const codeSnap = await get(ref(db, 'codes/' + code));
+  if (!codeSnap.exists()) throw new Error('Код олдсонгүй. Дахин шалгана уу.');
+
+  const info = codeSnap.val();          // {clubId, memberId, role}
+
+  const memberSnap = await get(ref(db, `clubs/${info.clubId}/members/${info.memberId}`));
+  if (!memberSnap.exists()) throw new Error('Гишүүний бүртгэл олдсонгүй.');
+  const m = memberSnap.val();
+
+  if ((m.email || '').toLowerCase() !== email.toLowerCase())
+    throw new Error('Имэйл кодтой тохирохгүй байна.');
+
+  state.user = {
+    role: m.role === 'Тэргүүн' ? 'leader' : (info.role || 'member'),
+    clubId: info.clubId,
+    memberId: info.memberId,
+    name: m.name || email,
+    email: m.email,
+    code,
+    full: m.full === true
+  };
+  saveSession();
+  toast('Тавтай морил, ' + state.user.name);
+  renderApp();
+}
+
+/* ---------- MEMBER REGISTER (activate code) ---------- */
+async function doRegister(code, email) {
+  const codeSnap = await get(ref(db, 'codes/' + code));
+  if (!codeSnap.exists()) throw new Error('Гишүүний код олдсонгүй.');
+  const info = codeSnap.val();
+
+  const mRef = ref(db, `clubs/${info.clubId}/members/${info.memberId}`);
+  const mSnap = await get(mRef);
+  if (!mSnap.exists()) throw new Error('Гишүүний бүртгэл олдсонгүй.');
+  const m = mSnap.val();
+
+  if (m.email && m.email.toLowerCase() !== email.toLowerCase())
+    throw new Error('Энэ код өөр имэйлд бүртгэгдсэн байна.');
+
+  await update(mRef, { email, activatedAt: Date.now() });
+
+  state.user = {
+    role: m.role === 'Тэргүүн' ? 'leader' : 'member',
+    clubId: info.clubId,
+    memberId: info.memberId,
+    name: m.name || email,
+    email,
+    code,
+    full: m.full === true
+  };
+  saveSession();
+  toast('Амжилттай бүртгэгдлээ!');
+  renderApp();
+}
+
+/* ---------- LEADER REGISTER (create club) ---------- */
+async function doLeaderRegister(fd) {
+  const clubId = 'c_' + uid();
+  const clubCode = await uniqueCode('CLUB');
+  const memberCode = await uniqueCode('MNG');
+  const memberId = 'm_' + uid();
+
+  const clubData = {
+    name: fd.clubName.trim(),
+    structure: (fd.structure || '').trim(),
+    school: fd.school.trim(),
+    code: clubCode,
+    logo: '',
+    leaderId: memberId,
+    leaderName: `${fd.lastname} ${fd.name}`.trim(),
+    createdAt: Date.now(),
+    features: { meetings:true, calendar:true, members:true, files:true, leaves:true, chat:true, news:true }
+  };
+
+  const leaderData = {
+    name: `${fd.lastname} ${fd.name}`.trim(),
+    email: fd.email.trim(),
+    phone: fd.phone.trim(),
+    role: 'Тэргүүн',
+    code: memberCode,
+    createdAt: Date.now()
+  };
+
+  await set(ref(db, 'clubs/' + clubId), clubData);
+  await set(ref(db, `clubs/${clubId}/members/${memberId}`), leaderData);
+  await set(ref(db, 'codes/' + clubCode),   { clubId, memberId, role: 'leader' });
+  await set(ref(db, 'codes/' + memberCode), { clubId, memberId, role: 'leader' });
+
+  openModal('🎉 Клуб амжилттай бүртгэгдлээ', `
+    <p class="muted small">Дараах кодуудыг хадгалж, гишүүддээ тараана уу.</p>
+    <div class="divider"></div>
+    <p class="small muted">Клубын нэгдсэн нэвтрэх код</p>
+    <div class="code-pill" data-copy="${clubCode}" style="margin:6px 0 16px">${clubCode} 📋</div>
+    <p class="small muted">Таны (Тэргүүний) хувийн код</p>
+    <div class="code-pill" data-copy="${memberCode}" style="margin:6px 0">${memberCode} 📋</div>
+  `, `<button class="btn primary" onclick="this.closest('.modal-backdrop').remove()">Ойлголoo</button>`);
+
+  $$('[data-copy]', modalEl).forEach(p => p.onclick = () => {
+    navigator.clipboard?.writeText(p.dataset.copy);
+    toast('Хуулагдлаа: ' + p.dataset.copy);
+  });
+
+  state.user = {
+    role: 'leader', clubId, memberId,
+    name: leaderData.name, email: leaderData.email,
+    code: memberCode, full: false
+  };
+  saveSession();
+  renderApp();
+}
+
+/* ---------- SOCIAL WORKER ---------- */
+function socialWorkerModal() {
+  openModal('🔒 Нийгмийн ажилтан', `
+    <div class="tabs" style="margin-top:0">
+      <button class="tab active" data-sw="login">Нэвтрэх</button>
+      <button class="tab" data-sw="reg">Бүртгүүлэх</button>
+    </div>
+    <form id="swForm">
+      <label>Имэйл<input name="email" type="email" required></label>
+      <div id="swExtra">
+        <label>Тусгай код<input name="special" placeholder="SOCIAL-W4"
+          style="text-transform:uppercase" required></label>
+      </div>
+      <label>Нууц үг<input name="password" type="password" required minlength="4"></label>
+      <button class="btn primary" style="width:100%" type="submit">Үргэлжлүүлэх</button>
+    </form>
+  `);
+
+  let swMode = 'login';
+  $$('[data-sw]', modalEl).forEach(t => t.onclick = () => {
+    swMode = t.dataset.sw;
+    $$('[data-sw]', modalEl).forEach(x => x.classList.toggle('active', x === t));
+    $('#swExtra', modalEl).style.display = swMode === 'reg' ? 'block' : 'none';
+  });
+  $('#swExtra', modalEl).style.display = 'none';
+
+  $('#swForm', modalEl).onsubmit = async e => {
+    e.preventDefault();
+    const fd = Object.fromEntries(new FormData(e.target));
+    try {
+      if (swMode === 'reg') {
+        if (fd.special.trim().toUpperCase() !== 'SOCIAL-W4')
+          throw new Error('Тусгай код буруу байна (SOCIAL-W4).');
+        const exists = await get(ref(db, 'socialWorkers'));
+        const list = exists.val() || {};
+        if (Object.values(list).some(x => x.email === fd.email))
+          throw new Error('Энэ имэйл бүртгэгдсэн байна.');
+        await set(ref(db, 'socialWorkers/' + uid()), {
+          email: fd.email, password: fd.password, createdAt: Date.now()
+        });
+        toast('Нийгмийн ажилтан бүртгэгдлээ');
+      } else {
+        const snap = await get(ref(db, 'socialWorkers'));
+        const list = snap.val() || {};
+        const found = Object.values(list).find(
+          x => x.email === fd.email && x.password === fd.password);
+        if (!found) throw new Error('Имэйл эсвэл нууц үг буруу.');
+        toast('Нийгмийн ажилтнаар нэвтэрлээ');
+      }
+      closeModal();
+      state.user = {
+        role: 'admin', clubId: null, memberId: null,
+        name: 'Нийгмийн ажилтан', email: fd.email, code: 'SOCIAL-W4', full: true
+      };
+      saveSession();
+      renderApp();
+    } catch (err) { toast(err.message, 'err'); }
+  };
+}
+
+/* ================================================================
+   APP SHELL
+   ================================================================ */
+function navItems() {
+  const base = [
+    { k:'dashboard', i:'🏠', t:'Хянах самбар' },
+    { k:'meetings',  i:'🤝', t:'Хурал & Протокол' },
+    { k:'calendar',  i:'📅', t:'Төлөвлөгөө' },
+    { k:'members',   i:'👥', t:'Гишүүд & Хариуцлага' },
+    { k:'files',     i:'📁', t:'Файл цэс' },
+    { k:'leaves',    i:'✉️', t:'Чөлөө хүсэх' },
+    { k:'chat',      i:'💬', t:'Чат' },
+    { k:'news',      i:'📰', t:'Мэдээ' },
+    { k:'profile',   i:'👤', t:'Профайл' },
+    { k:'settings',  i:'⚙️', t:'Тохиргоо' }
+  ];
+  if (isAdmin()) base.splice(1, 0, { k:'admin', i:'🏛', t:'Бүх ХӨУБ' });
+  return base;
+}
+
+function renderApp() {
+  const u = state.user;
+  rootEl.innerHTML = `
+  <header class="topbar glass">
+    <button class="icon-btn" id="burger">☰</button>
+    <div class="brand">Managementy</div>
+    <div class="spacer"></div>
+    <div class="chip">${esc(u.name || u.email)}</div>
+  </header>
+
+  <aside class="drawer glass" id="drawer">
+    <div class="drawer-head">
+      <div class="avatar">${esc((u.name || '?').charAt(0).toUpperCase())}</div>
+      <div style="min-width:0">
+        <div class="strong" style="font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(u.name || u.email)}</div>
+        <div class="muted small">${roleLabel(u.role)}</div>
+      </div>
+    </div>
+    <nav class="nav" id="nav">
+      ${navItems().map(i => `
+        <button class="nav-item ${state.view === i.k ? 'active' : ''}" data-nav="${i.k}">
+          <span>${i.i}</span>${i.t}
+        </button>`).join('')}
+    </nav>
+    <button class="btn ghost" id="logout" style="width:100%">🚪 Гарах</button>
+  </aside>
+
+  <div class="scrim" id="scrim"></div>
+  <main class="main"><div id="view"></div></main>`;
+
+  $('#burger').onclick = openDrawer;
+  $('#scrim').onclick  = closeDrawer;
+  $('#logout').onclick = () => {
+    clearUnsubs();
+    localStorage.removeItem('mgmt_session');
+    state.user = null; state.view = 'dashboard';
+    renderAuth();
+  };
+  $$('.nav-item').forEach(b => b.onclick = () => go(b.dataset.nav));
+
+  go(state.view);
+}
+
+function openDrawer()  { $('#drawer').classList.add('open');  $('#scrim').classList.add('show'); }
+function closeDrawer() { $('#drawer')?.classList.remove('open'); $('#scrim')?.classList.remove('show'); }
+
+const views = {};
+
+function go(view) {
+  state.view = view;
+  closeDrawer();
+  clearUnsubs();
+  $$('.nav-item').forEach(b => b.classList.toggle('active', b.dataset.nav === view));
+  const fn = views[view] || views.dashboard;
+  Promise.resolve(fn()).catch(err => {
+    console.error(err);
+    $('#view').innerHTML = `<div class="glass card"><h3>Алдаа</h3><p class="muted small">${esc(err.message)}</p></div>`;
+  });
+}
+
+/* ================================================================
+   VIEW: DASHBOARD
+   ================================================================ */
+views.dashboard = async function () {
+  const v = $('#view');
+
+  /* --- Admin: club list --- */
+  if (isAdmin() && !state.user.clubId) {
+    v.innerHTML = `
+      <div class="page-head">
+        <div><h2>🏛 Бүх ХӨУБ</h2><p class="muted">Нийт клубуудын жагсаалт ба удирдлага</p></div>
+      </div>
+      <div id="clubList" class="grid"></div>`;
+    const snap = await get(ref(db, 'clubs'));
+    const clubs = snap.val() || {};
+    const list = $('#clubList');
+    const entries = Object.entries(clubs);
+    if (!entries.length) {
+      list.innerHTML = `<div class="glass card empty">Клуб бүртгэгдээгүй байна.</div>`;
+      return;
+    }
+    list.innerHTML = entries.map(([id, c]) => `
+      <div class="glass card club-card" style="display:flex;flex-direction:column;gap:8px">
+        <div style="font-size:30px">${c.logo ? `<img src="${esc(c.logo)}" style="width:48px;height:48px;object-fit:cover;border-radius:14px">` : '🏛'}</div>
+        <h3 style="font-size:16px">${esc(c.name || '—')}</h3>
+        <p class="muted small">${esc(c.school || '')}</p>
+        <p class="muted small">${esc(c.structure || '')}</p>
+        <div class="code-pill" data-copy="${esc(c.code || '')}">${esc(c.code || '')} 📋</div>
+        <button class="btn primary sm" data-enter="${id}" style="margin-top:6px">Нээх →</button>
+      </div>`).join('');
+
+    $$('[data-copy]', list).forEach(p => p.onclick = () => {
+      navigator.clipboard?.writeText(p.dataset.copy); toast('Хуулагдлаа');
+    });
+    $$('[data-enter]', list).forEach(b => b.onclick = () => {
+      state.user.clubId = b.dataset.enter;
+      saveSession(); go('dashboard');
+    });
+    return;
+  }
+
+  /* --- Club dashboard --- */
+  const clubId = state.user.clubId;
+  if (!clubId) { v.innerHTML = `<div class="glass card empty">Клуб сонгоогүй байна.</div>`; return; }
+
+  const [clubS, memS, meetS, fileS, leaveS, evS] = await Promise.all([
+    get(ref(db, 'clubs/' + clubId)),
+    get(ref(db, `clubs/${clubId}/members`)),
+    get(ref(db, `clubs/${clubId}/meetings`)),
+    get(ref(db, `clubs/${clubId}/files`)),
+    get(ref(db, `clubs/${clubId}/leaves`)),
+    get(ref(db, `clubs/${clubId}/events`))
+  ]);
+
+  const club    = clubS.val() || {};
+  const members = Object.values(memS.val() || {});
+  const meets   = Object.values(meetS.val() || {});
+  const files   = Object.values(fileS.val() || {});
+  const leaves  = Object.values(leaveS.val() || {});
+  const events  = Object.values(evS.val() || {});
+  const pending = leaves.filter(l => l.status === 'pending').length;
+
+  v.innerHTML = `
+    <div class="page-head">
+      <div>
+        <h2>${esc(club.name || 'Клуб')}</h2>
+        <p class="muted">${esc(club.school || '')} · ${esc(club.structure || '')}</p>
+      </div>
+      ${isAdmin() ? `<button class="btn ghost sm" id="backClubs">← Бүх клуб</button>` : ''}
+    </div>
+
+    <div class="grid" style="margin-bottom:18px">
+      <div class="glass stat"><div class="num">${members.length}</div><div class="lbl">👥 Гишүүд</div></div>
+      <div class="glass stat"><div class="num">${meets.length}</div><div class="lbl">🤝 Хурал</div></div>
+      <div class="glass stat"><div class="num">${events.length}</div><div class="lbl">📅 Эвент</div></div>
+      <div class="glass stat"><div class="num">${files.length}</div><div class="lbl">📁 Файл</div></div>
+      <div class="glass stat"><div class="num">${pending}</div><div class="lbl">✉️ Хүлээгдэж буй чөлөө</div></div>
+    </div>
+
+    <div class="glass card" style="margin-bottom:16px">
+      <div class="row" style="align-items:center">
+        <div>
+          <p class="muted small">Клубын нэгдсэн нэвтрэх код</p>
+          <div class="code-pill" data-copy="${esc(club.code || '')}" style="margin-top:6px">${esc(club.code || '—')} 📋</div>
+        </div>
+        <div>
+          <p class="muted small">Тэргүүн</p>
+          <p class="strong">${esc(club.leaderName || '—')}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="glass card">
+      <h3 style="font-size:16px;margin-bottom:12px">📌 Сүүлийн үйл ажиллагаа</h3>
+      <div class="list">
+        ${meets.slice(-3).reverse().map(m => `
+          <div class="item" data-go="meetings">
+            <h4>🤝 ${esc(m.purpose || 'Хурал')}</h4>
+            <p class="muted small">${esc(m.date || '')} ${esc(m.time || '')} · ${esc(m.place || '')}</p>
+          </div>`).join('') || ''}
+        ${events.slice(-3).reverse().map(e => `
+          <div class="item" data-go="calendar">
+            <h4>📅 ${esc(e.name || 'Эвент')}</h4>
+            <p class="muted small">${esc(e.date || '')} · ${esc(e.where || '')}</p>
+          </div>`).join('') || ''}
+        ${(!meets.length && !events.length) ? `<p class="empty">Одоогоор үйл ажиллагаа бүртгэгдээгүй.</p>` : ''}
+      </div>
+    </div>`;
+
+  $$('[data-go]', v).forEach(el => el.onclick = () => go(el.dataset.go));
+  $$('[data-copy]', v).forEach(p => p.onclick = () => {
+    navigator.clipboard?.writeText(p.dataset.copy); toast('Хуулагдлаа: ' + p.dataset.copy);
+  });
+  const bc = $('#backClubs', v);
+  if (bc) bc.onclick = () => { state.user.clubId = null; saveSession(); go('dashboard'); };
+};
+
+/* ================================================================
+   VIEW: MEETINGS
+   ================================================================ */
+views.meetings = async function () {
+  const v = $('#view');
+  const clubId = state.user.clubId;
+  if (!clubId) { v.innerHTML = `<div class="glass card empty">Клуб сонгоно уу.</div>`; return; }
+
+  v.innerHTML = `
+    <div class="page-head">
+      <div><h2>🤝 Хурал & Протокол</h2><p class="muted">Хурлын тэмдэглэл, ирц, протокол, зураг</p></div>
+      ${canManage() ? `<button class="btn primary" id="newMeeting">+ Хурал үүсгэх</button>` : ''}
+    </div>
+    <div id="meetList" class="list"></div>`;
+
+  const snap = await get(ref(db, `clubs/${clubId}/meetings`));
+  const raw  = snap.val() || {};
+  const list = Object.entries(raw).map(([id, m]) => ({ id, ...m }))
+                     .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+  const box = $('#meetList', v);
+
+  if (!list.length) { box.innerHTML = `<div class="glass card empty">Хурал бүртгэгдээгүй байна.</div>`; }
+  else {
+    box.innerHTML = list.map(m => `
+      <div class="glass item" data-mid="${m.id}">
+        <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap">
+          <h4>${esc(m.purpose || 'Хурал')}</h4>
+          <span class="badge ${m.protocol ? 'green' : 'amber'}">${m.protocol ? 'Протоколтой' : 'Хүлээгдэж буй'}</span>
+        </div>
+        <p class="muted small" style="margin-top:6px">
+          📅 ${esc(m.date || '')} ⏰ ${esc(m.time || '')} 📍 ${esc(m.place || '')}
+        </p>
+        <p class="muted small">👥 Ирц: ${(m.attendance ? Object.keys(m.attendance).length : 0)} гишүүн</p>
+      </div>`).join('');
+
+    $$('[data-mid]', box).forEach(el => el.onclick = () => meetingDetail(el.dataset.mid));
+  }
+
+  if (canManage()) $('#newMeeting', v).onclick = () => meetingForm();
+};
+
+function meetingForm(existing = null, id = null) {
+  const e = existing || {};
+  openModal(id ? '✏️ Хурал засах' : '🤝 Шинэ хурал үүсгэх', `
+    <form id="mForm">
+      <label>Зорилго / Гарчиг<input name="purpose" required value="${esc(e.purpose || '')}"></label>
+      <div class="row">
+        <label>Он сар өдөр<input name="date" type="date" required value="${esc(e.date || todayISO())}"></label>
+        <label>Цаг<input name="time" type="time" required value="${esc(e.time || '14:00')}"></label>
+      </div>
+      <label>Хаана<input name="place" required value="${esc(e.place || '')}" placeholder="Жишээ: 204 тоот"></label>
+      <label>Тэмдэглэл (сонголтоор)<textarea name="note">${esc(e.note || '')}</textarea></label>
+    </form>
+  `, `
+    <button class="btn ghost" data-close>Болих</button>
+    <button class="btn primary" id="saveM">Хадгалах</button>
+  `);
+
+  $('#saveM', modalEl).onclick = async () => {
+    const f = $('#mForm', modalEl);
+    if (!f.reportValidity()) return;
+    const data = Object.fromEntries(new FormData(f));
+    data.createdAt = e.createdAt || Date.now();
+    data.updatedAt = Date.now();
+    try {
+      const clubId = state.user.clubId;
+      if (id) await update(ref(db, `clubs/${clubId}/meetings/${id}`), data);
+      else    await set(push(ref(db, `clubs/${clubId}/meetings`)), data);
+      closeModal(); toast('Хадгалагдлаа'); views.meetings();
+    } catch (err) { toast(err.message, 'err'); }
+  };
+}
+
+async function meetingDetail(id) {
+  const clubId = state.user.clubId;
+  const [mSnap, memSnap] = await Promise.all([
+    get(ref(db, `clubs/${clubId}/meetings/${id}`)),
+    get(ref(db, `clubs/${clubId}/members`))
+  ]);
+  if (!mSnap.exists()) return toast('Хурал олдсонгүй', 'err');
+  const m = mSnap.val();
+  const members = Object.entries(memSnap.val() || {});
+  const att = m.attendance || {};
+
+  const attHTML = members.length ? members.map(([mid, mem]) => `
+      <label style="display:flex;align-items:center;gap:10px;margin-bottom:8px;cursor:pointer;color:var(--text)">
+        <input type="checkbox" data-att="${mid}" ${att[mid] ? 'checked' : ''}
+               style="width:18px;height:18px;margin:0;flex:0 0 auto" ${canManage() ? '' : 'disabled'}>
+        <span style="font-size:13.5px">${esc(mem.name)} <span class="muted small">${esc(mem.role || '')}</span></span>
+      </label>`).join('') : '<p class="muted small">Гишүүн бүртгэгдээгүй.</p>';
+
+  openModal('🤝 ' + esc(m.purpose || 'Хурал'), `
+    <p class="muted small">📅 ${esc(m.date || '')} ⏰ ${esc(m.time || '')} 📍 ${esc(m.place || '')}</p>
+    ${m.note ? `<p class="small" style="margin-top:10px">${esc(m.note)}</p>` : ''}
+    <div class="divider"></div>
+
+    <h4 style="font-size:14px;margin-bottom:10px">👥 Ирц бүртгэх</h4>
+    <div id="attBox">${attHTML}</div>
+
+    <div class="divider"></div>
+    <h4 style="font-size:14px;margin-bottom:8px">📝 Хурлын протокол</h4>
+    <textarea id="proto" ${canManage() ? '' : 'readonly'} placeholder="Протоколын агуулга...">${esc(m.protocol || '')}</textarea>
+
+    <div class="divider"></div>
+    <h4 style="font-size:14px;margin-bottom:8px">🖼 Зураг / бичиг баримт</h4>
+    <div id="mFiles" style="display:flex;flex-wrap:wrap;gap:8px">
+      ${(m.files || []).map(f => f.type?.startsWith('image')
+        ? `<img src="${esc(f.url)}" style="width:88px;height:88px;object-fit:cover;border-radius:12px">`
+        : `<a class="code-pill" href="${esc(f.url)}" download="${esc(f.name)}">📄 ${esc(f.name)}</a>`).join('')
+        || '<p class="muted small">Файл байхгүй.</p>'}
+    </div>
+    ${canManage() ? `
+      <input type="file" id="mFileInput" multiple style="margin-top:10px">
+    ` : ''}
+  `, `
+    ${canManage() ? `<button class="btn danger" id="delM">Устгах</button>` : ''}
+    <button class="btn ghost" data-close>Хаах</button>
+    ${canManage() ? `<button class="btn primary" id="saveAll">Хадгалах</button>` : ''}
+  `);
+
+  if (canManage()) {
+    $('#delM', modalEl).onclick = async () => {
+      if (!confirm('Хурлыг устгах уу?')) return;
+      await remove(ref(db, `clubs/${clubId}/meetings/${id}`));
+      closeModal(); toast('Устгагдлаа'); views.meetings();
+    };
+    $('#saveAll', modalEl).onclick = async () => {
+      const attendance = {};
+      $$('[data-att]', modalEl).forEach(c => { if (c.checked) attendance[c.dataset.att] = true; });
+      const protocol = $('#proto', modalEl).value;
+
+      let files = m.files || [];
+      const fi = $('#mFileInput', modalEl);
+      if (fi && fi.files.length) {
+        for (const f of fi.files) {
+          if (f.size > 900000) { toast(f.name + ' хэт том (900KB+)', 'err'); continue; }
+          files.push({ name: f.name, type: f.type, url: await fileToDataURL(f) });
+        }
+      }
+      await update(ref(db, `clubs/${clubId}/meetings/${id}`), { attendance, protocol, files, updatedAt: Date.now() });
+      closeModal(); toast('Хадгалагдлаа'); views.meetings();
+    };
+  }
+}
+
+/* ================================================================
+   VIEW: CALENDAR
+   ================================================================ */
+views.calendar = async function () {
+  const v = $('#view');
+  const clubId = state.user.clubId;
+  if (!clubId) { v.innerHTML = `<div class="glass card empty">Клуб сонгоно уу.</div>`; return; }
+
+  v.innerHTML = `
+    <div class="page-head">
+      <div><h2>📅 Төлөвлөгөө / Календарь</h2><p class="muted">Өдөр дээр дарахад дэлгэрэнгүй цонх нээгдэнэ</p></div>
+    </div>
+    <div class="glass card">
+      <div class="cal-head">
+        <button class="icon-btn" id="prevM">‹</button>
+        <div class="strong" id="calTitle"></div>
+        <button class="icon-btn" id="nextM">›</button>
+      </div>
+      <div class="cal-grid" id="calGrid"></div>
+    </div>`;
+
+  const snap = await get(ref(db, `clubs/${clubId}/events`));
+  const events = snap.val() || {};
+  const byDate = {};
+  Object.entries(events).forEach(([id, e]) => {
+    (byDate[e.date] = byDate[e.date] || []).push({ id, ...e });
+  });
+
+  function draw() {
+    const c = state.calCursor;
+    const y = c.getFullYear(), mo = c.getMonth();
+    $('#calTitle', v).textContent = `${y} оны ${mo + 1} сар`;
+
+    const first = new Date(y, mo, 1).getDay();          // 0=Sun
+    const start = (first + 6) % 7;                      // Monday first
+    const days  = new Date(y, mo + 1, 0).getDate();
+
+    let html = ['Да','Мя','Лх','Пү','Ба','Бя','Ня']
+      .map(d => `<div class="cal-dow">${d}</div>`).join('');
+    for (let i = 0; i < start; i++) html += `<div class="cal-day empty"></div>`;
+
+    const tISO = todayISO();
+    for (let d = 1; d <= days; d++) {
+      const iso = `${y}-${String(mo + 1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+      const evs = byDate[iso] || [];
+      html += `<div class="cal-day ${evs.length ? 'has-ev' : ''} ${iso === tISO ? 'today' : ''}" data-date="${iso}">
+        <span>${d}</span>${evs.length ? '<span class="dot"></span>' : ''}
+      </div>`;
+    }
+    $('#calGrid', v).innerHTML = html;
+    $$('.cal-day[data-date]', v).forEach(el => el.onclick = () => dayModal(el.dataset.date, byDate[el.dataset.date] || []));
+  }
+
+  $('#prevM', v).onclick = () => { state.calCursor.setMonth(state.calCursor.getMonth() - 1); draw(); };
+  $('#nextM', v).onclick = () => { state.calCursor.setMonth(state.calCursor.getMonth() + 1); draw(); };
+  draw();
+};
+
+function dayModal(date, evs) {
+  const body = evs.length ? evs.map(e => `
+      <div class="item" style="margin-bottom:10px;cursor:default">
+        ${e.image ? `<img src="${esc(e.image)}" style="width:100%;max-height:170px;object-fit:cover;border-radius:12px;margin-bottom:10px">` : ''}
+        <h4>${esc(e.name || 'Эвент')}</h4>
+        <p class="muted small" style="margin-top:5px">🕐 ${esc(e.when || '')} 📍 ${esc(e.where || '')}</p>
+        ${e.partners ? `<p class="muted small">🤝 ${esc(e.partners)}</p>` : ''}
+        ${e.guideline ? `<p class="small" style="margin-top:8px">${esc(e.guideline)}</p>` : ''}
+        ${canManage() ? `<div style="margin-top:10px;display:flex;gap:8px">
+          <button class="btn sm" data-edit="${e.id}">✏️ ЗАСАХ</button>
+          <button class="btn sm danger" data-del="${e.id}">🗑</button>
+        </div>` : ''}
+      </div>`).join('')
+    : `<p class="empty">Энэ өдөрт бүртгэл байхгүй.</p>`;
+
+  openModal('📅 ' + date, body, canManage()
+    ? `<button class="btn ghost" data-close>Хаах</button>
+       <button class="btn primary" id="addEv">+ НЭМЭХ</button>`
+    : `<button class="btn ghost" data-close>Хаах</button>`);
+
+  const add = $('#addEv', modalEl);
+  if (add) add.onclick = () => eventForm(date);
+  $$('[data-edit]', modalEl).forEach(b => b.onclick = () => {
+    const e = evs.find(x => x.id === b.dataset.edit);
+    eventForm(date, e, e.id);
+  });
+  $$('[data-del]', modalEl).forEach(b => b.onclick = async () => {
+    if (!confirm('Устгах уу?')) return;
+    await remove(ref(db, `clubs/${state.user.clubId}/events/${b.dataset.del}`));
+    closeModal(); toast('Устгагдлаа'); views.calendar();
+  });
+}
+
+function eventForm(date, existing = null, id = null) {
+  const e = existing || {};
+  openModal(id ? '✏️ Эвент засах' : '➕ Шинэ эвент', `
+    <form id="eForm">
+      <label>Нэр<input name="name" required value="${esc(e.name || '')}"></label>
+      <label>Огноо<input name="date" type="date" required value="${esc(e.date || date)}"></label>
+      <label>Хэзээ / Хэдэн цагт<input name="when" value="${esc(e.when || '')}" placeholder="14:00-16:00"></label>
+      <label>Хаана<input name="where" value="${esc(e.where || '')}" placeholder="Акт танхим"></label>
+      <label>Хамтран ажиллаж буй<input name="partners" value="${esc(e.partners || '')}"></label>
+      <label>Удирдамж<textarea name="guideline">${esc(e.guideline || '')}</textarea></label>
+      <label>Зураг (сонголтоор)<input type="file" name="image" accept="image/*"></label>
+    </form>
+  `, `
+    <button class="btn ghost" data-close>Болих</button>
+    <button class="btn primary" id="saveEv">Хадгалах</button>
+  `);
+
+  $('#saveEv', modalEl).onclick = async () => {
+    const f = $('#eForm', modalEl);
+    if (!f.reportValidity()) return;
+    const fd = new FormData(f);
+    const data = {
+      name: fd.get('name'), date: fd.get('date'), when: fd.get('when'),
+      where: fd.get('where'), partners: fd.get('partners'),
+      guideline: fd.get('guideline'),
+      image: e.image || '',
+      createdAt: e.createdAt || Date.now()
+    };
+    const img = f.querySelector('input[type=file]').files[0];
+    if (img) {
+      if (img.size > 900000) return toast('Зураг хэт том (900KB+)', 'err');
+      data.image = await fileToDataURL(img);
+    }
+    const clubId = state.user.clubId;
+    if (id) await update(ref(db, `clubs/${clubId}/events/${id}`), data);
+    else    await set(push(ref(db, `clubs/${clubId}/events`)), data);
+    closeModal(); toast('Хадгалагдлаа'); views.calendar();
+  };
+}
+
+/* ================================================================
+   VIEW: MEMBERS
+   ================================================================ */
+views.members = async function () {
+  const v = $('#view');
+  const clubId = state.user.clubId;
+  if (!clubId) { v.innerHTML = `<div class="glass card empty">Клуб сонгоно уу.</div>`; return; }
+
+  v.innerHTML = `
+    <div class="page-head">
+      <div><h2>👥 Гишүүд & Хариуцлага</h2><p class="muted">Гишүүний код, зөрчил, оноожуулалт</p></div>
+      ${canManage() ? `<button class="btn primary" id="addMem">+ Гишүүн нэмэх</button>` : ''}
+    </div>
+    <div id="memList" class="grid"></div>`;
+
+  const [memS, recS] = await Promise.all([
+    get(ref(db, `clubs/${clubId}/members`)),
+    get(ref(db, `clubs/${clubId}/records`))
+  ]);
+  const members = Object.entries(memS.val() || {});
+  const records = Object.values(recS.val() || {});
+  const box = $('#memList', v);
+
+  if (!members.length) { box.innerHTML = `<div class="glass card empty">Гишүүн бүртгэгдээгүй.</div>`; }
+  else {
+    box.innerHTML = members.map(([mid, m]) => {
+      const recs = records.filter(r => r.memberId === mid);
+      const pts  = recs.reduce((s, r) => s + (Number(r.points) || 0), 0);
+      return `
+      <div class="glass card" style="display:flex;flex-direction:column;gap:8px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div class="avatar" style="width:40px;height:40px;font-size:16px;border-radius:12px">
+            ${esc((m.name || '?').charAt(0).toUpperCase())}
+          </div>
+          <div style="min-width:0">
+            <div class="strong" style="font-size:14.5px">${esc(m.name || '—')}</div>
+            <div class="muted small">${esc(m.role || 'Гишүүн')} · ${esc(m.class || '')}</div>
+          </div>
+        </div>
+        <p class="muted small">✉️ ${esc(m.email || '—')}</p>
+        <p class="muted small">📞 ${esc(m.phone || '—')} · Асран хамгаалагч: ${esc(m.guardian || '—')}</p>
+        <div class="code-pill" data-copy="${esc(m.code || '')}">${esc(m.code || '—')} 📋</div>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <span class="badge ${pts > 0 ? 'red' : 'green'}">Оноо: ${pts}</span>
+          <span class="badge blue">${recs.length} бүртгэл</span>
+          ${canManage() ? `<button class="btn sm" data-rec="${mid}" data-name="${esc(m.name)}">+ Хариуцлага</button>` : ''}
+        </div>
+      </div>`;
+    }).join('');
+
+    $$('[data-copy]', box).forEach(p => p.onclick = () => {
+      navigator.clipboard?.writeText(p.dataset.copy); toast('Хуулагдлаа: ' + p.dataset.copy);
+    });
+    $$('[data-rec]', box).forEach(b => b.onclick = () => recordForm(b.dataset.rec, b.dataset.name));
+  }
+
+  if (canManage()) $('#addMem', v).onclick = addMemberForm;
+};
+
+function addMemberForm() {
+  openModal('👥 Гишүүн нэмэх', `
+    <form id="addMemForm">
+      <div class="row">
+        <label>Нэр<input name="name" required></label>
+        <label>Овог<input name="lastname"></label>
+      </div>
+      <label>Имэйл<input name="email" type="email" placeholder="(сонголтоор)"></label>
+      <label>Утас<input name="phone" placeholder="99112233"></label>
+      <label>Асран хамгаалагчийн утас<input name="guardian"></label>
+      <div class="row">
+        <label>Анги-бүлэг<input name="class" placeholder="10А"></label>
+        <label>Хүйс
+          <select name="gender"><option>Эрэгтэй</option><option>Эмэгтэй</option></select>
+        </label>
+      </div>
+      <label>Түвшин
+        <select name="role">
+          <option>Гишүүн</option>
+          <option>Нарийн бичиг</option>
+          <option>Дэд тэргүүн</option>
+          <option>Тэргүүн</option>
+        </select>
+      </label>
+    </form>
+  `, `
+    <button class="btn ghost" data-close>Болих</button>
+    <button class="btn primary" id="saveMem">Нэмэх & Код үүсгэх</button>
+  `);
+
+  $('#saveMem', modalEl).onclick = async () => {
+    const f = $('#addMemForm', modalEl);
+    if (!f.reportValidity()) return;
+    const fd = Object.fromEntries(new FormData(f));
+    const clubId = state.user.clubId;
+    const code = await uniqueCode('MNG');
+    const memberId = 'm_' + uid();
+    const fullName = `${fd.lastname || ''} ${fd.name || ''}`.trim();
+
+    await set(ref(db, `clubs/${clubId}/members/${memberId}`), {
+      name: fullName,
+      email: fd.email || '',
+      phone: fd.phone || '',
+      guardian: fd.guardian || '',
+      class: fd.class || '',
+      gender: fd.gender || '',
+      role: fd.role || 'Гишүүн',
+      code,
+      createdAt: Date.now()
+    });
+    await set(ref(db, 'codes/' + code), { clubId, memberId, role: 'member' });
+
+    openModal('✅ Гишүүн нэмэгдлээ', `
+      <p class="muted small">${esc(fullName)}-д зориулсан дахин давтагдашгүй код:</p>
+      <div class="code-pill" data-copy="${code}" style="font-size:18px;margin:14px 0">${code} 📋</div>
+      <p class="muted small">Гишүүн энэ кодоо ашиглан бүртгүүлж / нэвтэрнэ.</p>
+    `, `<button class="btn primary" data-close>Ойлголoo</button>`);
+
+    $$('[data-copy]', modalEl).forEach(p => p.onclick = () => {
+      navigator.clipboard?.writeText(p.dataset.copy); toast('Хуулагдлаа');
+    });
+    views.members();
+  };
+}
+
+function recordForm(memberId, memberName) {
+  openModal('⚠️ Хариуцлага бүртгэх — ' + esc(memberName), `
+    <form id="recForm">
+      <label>Төрөл
+        <select name="type">
+          <option>Зөрчил</option>
+          <option>Сахилгын</option>
+          <option>Ирц</option>
+          <option>Гарзны шагнал</option>
+          <option>Сайн дурын ажил</option>
+        </select>
+      </label>
+      <label>Оноо (+/-)<input name="points" type="number" value="0"></label>
+      <label>Тайлбар<textarea name="desc" required></textarea></label>
+      <label>Огноо<input name="date" type="date" value="${todayISO()}"></label>
+    </form>
+  `, `
+    <button class="btn ghost" data-close>Болих</button>
+    <button class="btn primary" id="saveRec">Хадгалах</button>
+  `);
+
+  $('#saveRec', modalEl).onclick = async () => {
+    const f = $('#recForm', modalEl);
+    if (!f.reportValidity()) return;
+    const data = Object.fromEntries(new FormData(f));
+    data.memberId = memberId;
+    data.createdAt = Date.now();
+    await set(push(ref(db, `clubs/${state.user.clubId}/records`)), data);
+    closeModal(); toast('Бүртгэгдлээ'); views.members();
+  };
+}
+
+/* ================================================================
+   VIEW: FILES
+   ================================================================ */
+views.files = async function () {
+  const v = $('#view');
+  const clubId = state.user.clubId;
+  if (!clubId) { v.innerHTML = `<div class="glass card empty">Клуб сонгоно уу.</div>`; return; }
+
+  v.innerHTML = `
+    <div class="page-head">
+      <div><h2>📁 Албан бичгийн архив</h2><p class="muted">Удирдамж, Тайлан, Албан бичиг</p></div>
+      ${canManage() ? `<button class="btn primary" id="upFile">+ Файл байршуулах</button>` : ''}
+    </div>
+    <div class="room-tabs" id="fileTabs">
+      <button class="btn sm primary" data-t="all">Бүгд</button>
+      <button class="btn sm" data-t="Удирдамж">Удирдамж</button>
+      <button class="btn sm" data-t="Тайлан">Тайлан</button>
+      <button class="btn sm" data-t="Албан бичиг">Албан бичиг</button>
+    </div>
+    <div id="fileList" class="list"></div>`;
+
+  const snap = await get(ref(db, `clubs/${clubId}/files`));
+  const all = Object.entries(snap.val() || {}).map(([id, f]) => ({ id, ...f }))
+                    .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+  const box = $('#fileList', v);
+
+  function draw(filter = 'all') {
+    const list = filter === 'all' ? all : all.filter(f => f.type === filter);
+    if (!list.length) { box.innerHTML = `<div class="glass card empty">Файл байхгүй.</div>`; return; }
+    box.innerHTML = list.map(f => `
+      <div class="glass item" style="cursor:default">
+        <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap">
+          <h4>📄 ${esc(f.name || 'Файл')}</h4>
+          <span class="badge blue">${esc(f.type || 'Бусад')}</span>
+        </div>
+        <p class="muted small" style="margin-top:6px">
+          ✍️ Бичсэн: ${esc(f.writtenDate || '—')} · 📌 Болсон: ${esc(f.eventDate || '—')}
+        </p>
+        ${f.note ? `<p class="small" style="margin-top:6px">${esc(f.note)}</p>` : ''}
+        <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
+          ${f.url ? `<a class="btn sm" href="${esc(f.url)}" download="${esc(f.fileName || f.name)}" target="_blank">⬇️ Татах</a>` : ''}
+          ${canManage() ? `<button class="btn sm danger" data-del="${f.id}">🗑 Устгах</button>` : ''}
+        </div>
+      </div>`).join('');
+
+    $$('[data-del]', box).forEach(b => b.onclick = async () => {
+      if (!confirm('Устгах уу?')) return;
+      await remove(ref(db, `clubs/${clubId}/files/${b.dataset.del}`));
+      toast('Устгагдлаа'); views.files();
+    });
+  }
+  draw();
+
+  $$('#fileTabs .btn', v).forEach(b => b.onclick = () => {
+    $$('#fileTabs .btn', v).forEach(x => x.classList.remove('primary'));
+    b.classList.add('primary');
+    draw(b.dataset.t);
+  });
+
+  if (canManage()) $('#upFile', v).onclick = () => {
+    openModal('📁 Файл байршуулах', `
+      <form id="fForm">
+        <label>Файлын нэр<input name="name" required></label>
+        <div class="row">
+          <label>Хэзээ бичсэн<input name="writtenDate" type="date" required value="${todayISO()}"></label>
+          <label>Хэзээ болсон<input name="eventDate" type="date" value="${todayISO()}"></label>
+        </div>
+        <label>Бичгийн төрөл
+          <select name="type">
+            <option>Удирдамж</option>
+            <option>Тайлан</option>
+            <option>Албан бичиг</option>
+            <option>Бусад</option>
+          </select>
+        </label>
+        <label>Тэмдэглэл<textarea name="note"></textarea></label>
+        <label>Файл (900KB хүртэл)<input type="file" name="file"></label>
+      </form>
+    `, `
+      <button class="btn ghost" data-close>Болих</button>
+      <button class="btn primary" id="saveF">Байршуулах</button>
+    `);
+
+    $('#saveF', modalEl).onclick = async () => {
+      const f = $('#fForm', modalEl);
+      if (!f.reportValidity()) return;
+      const fd = new FormData(f);
+      const file = f.querySelector('input[type=file]').files[0];
+      let url = '', fileName = '';
+      if (file) {
+        if (file.size > 900000) return toast('Файл хэт том (900KB+)', 'err');
+        url = await fileToDataURL(file);
+        fileName = file.name;
+      }
+      await set(push(ref(db, `clubs/${clubId}/files`)), {
+        name: fd.get('name'), writtenDate: fd.get('writtenDate'),
+        eventDate: fd.get('eventDate'), type: fd.get('type'),
+        note: fd.get('note'), url, fileName, createdAt: Date.now()
+      });
+      closeModal(); toast('Байршуулагдлаа'); views.files();
+    };
+  };
+};
+
+/* ================================================================
+   VIEW: LEAVES
+   ================================================================ */
+views.leaves = async function () {
+  const v = $('#view');
+  const clubId = state.user.clubId;
+  if (!clubId) { v.innerHTML = `<div class="glass card empty">Клуб сонгоно уу.</div>`; return; }
+
+  v.innerHTML = `
+    <div class="page-head">
+      <div><h2>✉️ Чөлөө хүсэх</h2><p class="muted">Хүсэлт илгээх, шийдвэрлэх</p></div>
+      <button class="btn primary" id="newLeave">+ Чөлөө хүсэх</button>
+    </div>
+    <div id="leaveList" class="list"></div>`;
+
+  const snap = await get(ref(db, `clubs/${clubId}/leaves`));
+  let list = Object.entries(snap.val() || {}).map(([id, l]) => ({ id, ...l }))
+                   .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+
+  if (!canManage()) list = list.filter(l => l.memberId === state.user.memberId);
+
+  const box = $('#leaveList', v);
+  if (!list.length) box.innerHTML = `<div class="glass card empty">Чөлөөний хүсэлт байхгүй.</div>`;
+  else {
+    box.innerHTML = list.map(l => `
+      <div class="glass item" style="cursor:default">
+        <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap">
+          <h4>${esc(l.memberName || '—')}</h4>
+          <span class="badge ${l.status === 'approved' ? 'green' : l.status === 'rejected' ? 'red' : 'amber'}">
+            ${l.status === 'approved' ? 'Зөвшөөрсөн' : l.status === 'rejected' ? 'Татгалзсан' : 'Хүлээгдэж буй'}
+          </span>
+        </div>
+        <p class="muted small" style="margin-top:6px">📅 ${esc(l.from || '')} → ${esc(l.to || '')}</p>
+        <p class="small" style="margin-top:6px">${esc(l.reason || '')}</p>
+        ${canManage() && l.status === 'pending' ? `
+          <div style="margin-top:10px;display:flex;gap:8px">
+            <button class="btn sm ok" data-ok="${l.id}">✓ Зөвшөөрөх</button>
+            <button class="btn sm danger" data-no="${l.id}">✕ Татгалзах</button>
+          </div>` : ''}
+      </div>`).join('');
+
+    $$('[data-ok]', box).forEach(b => b.onclick = () => decide(b.dataset.ok, 'approved'));
+    $$('[data-no]', box).forEach(b => b.onclick = () => decide(b.dataset.no, 'rejected'));
+  }
+
+  async function decide(id, status) {
+    await update(ref(db, `clubs/${clubId}/leaves/${id}`), { status, decidedAt: Date.now() });
+    toast(status === 'approved' ? 'Зөвшөөрөгдлөө' : 'Татгалзлаа');
+    views.leaves();
+  }
+
+  $('#newLeave', v).onclick = () => {
+    openModal('✉️ Чөлөө хүсэх', `
+      <form id="lvForm">
+        <div class="row">
+          <label>Эхлэх<input name="from" type="date" required value="${todayISO()}"></label>
+          <label>Дуусах<input name="to" type="date" required value="${todayISO()}"></label>
+        </div>
+        <label>Шалтгаан<textarea name="reason" required></textarea></label>
+      </form>
+    `, `
+      <button class="btn ghost" data-close>Болих</button>
+      <button class="btn primary" id="saveLv">Илгээх</button>
+    `);
+
+    $('#saveLv', modalEl).onclick = async () => {
+      const f = $('#lvForm', modalEl);
+      if (!f.reportValidity()) return;
+      const fd = Object.fromEntries(new FormData(f));
+      await set(push(ref(db, `clubs/${clubId}/leaves`)), {
+        memberId: state.user.memberId,
+        memberName: state.user.name,
+        from: fd.from, to: fd.to, reason: fd.reason,
+        status: 'pending', createdAt: Date.now()
+      });
+      closeModal(); toast('Хүсэлт илгээгдлээ'); views.leaves();
+    };
+  };
+};
+
+/* ================================================================
+   VIEW: CHAT
+   ================================================================ */
+views.chat = async function () {
+  const v = $('#view');
+  const clubId = state.user.clubId;
+
+  const rooms = [
+    { k:'club',   t:'🏫 Клубын чат',      need: true },
+    { k:'board',  t:'🏛 ХӨУБУЗ',          need: canManage() },
+    { k:'global', t:'🌍 Бүх ХӨУБ',        need: true }
+  ].filter(r => r.need);
+
+  if (!rooms.find(r => r.k === state.chatRoom)) state.chatRoom = rooms[0].k;
+
+  v.innerHTML = `
+    <div class="page-head">
+      <div><h2>💬 Чат</h2><p class="muted">Мессеж, зураг, файл, санал асуулга</p></div>
+    </div>
+    <div class="room-tabs">
+      ${rooms.map(r => `<button class="btn sm ${state.chatRoom === r.k ? 'primary' : ''}" data-room="${r.k}">${r.t}</button>`).join('')}
+    </div>
+    <div class="glass card chat-wrap" style="padding:0;overflow:hidden">
+      <div class="chat-msgs" id="msgs"></div>
+      <div class="chat-input">
+        <button class="icon-btn" id="attachBtn" title="Файл / Зураг">📎</button>
+        <button class="icon-btn" id="pollBtn" title="Санал асуулга">📊</button>
+        <input type="text" id="msgInput" placeholder="Мессеж бичих...">
+        <button class="btn primary sm" id="sendBtn">Илгээх</button>
+      </div>
+      <input type="file" id="fileInput" style="display:none">
+    </div>`;
+
+  $$('[data-room]', v).forEach(b => b.onclick = () => { state.chatRoom = b.dataset.room; go('chat'); });
+
+  const roomKey = state.chatRoom === 'club'
+    ? `chats/club_${clubId}`
+    : `chats/${state.chatRoom}`;
+
+  const msgsBox = $('#msgs', v);
+  const unsub = onValue(ref(db, roomKey + '/messages'), snap => {
+    const data = snap.val() || {};
+    const list = Object.entries(data).map(([id, m]) => ({ id, ...m }))
+                       .sort((a, b) => (a.ts || 0) - (b.ts || 0));
+    if (!list.length) { msgsBox.innerHTML = `<p class="empty">Мессеж байхгүй. Эхний мессежийг бичээрэй!</p>`; return; }
+    msgsBox.innerHTML = list.map(m => {
+      const mine = m.uid === state.user.memberId || m.uid === state.user.email;
+      let inner = '';
+      if (m.type === 'poll') {
+        const votes = m.votes || {};
+        inner = `<div class="strong" style="margin-bottom:8px">📊 ${esc(m.pollQ || '')}</div>` +
+          (m.pollOptions || []).map((o, i) => {
+            const c = Object.values(votes).filter(x => x === i).length;
+            return `<button class="btn sm" data-vote="${m.id}|${i}" style="width:100%;margin-bottom:6px;justify-content:space-between">
+              <span>${esc(o)}</span><span class="badge">${c}</span></button>`;
+          }).join('');
+      } else if (m.type === 'image') {
+        inner = `${m.text ? esc(m.text) + '<br>' : ''}<img src="${esc(m.url)}" alt="">`;
+      } else if (m.type === 'file') {
+        inner = `${m.text ? esc(m.text) + '<br>' : ''}<a class="file" href="${esc(m.url)}" download="${esc(m.fileName)}">📄 ${esc(m.fileName)}</a>`;
+      } else {
+        inner = esc(m.text || '');
+      }
+      return `<div class="msg ${mine ? 'me' : ''}">
+        ${mine ? '' : `<div class="who">${esc(m.name || '')}</div>`}
+        ${inner}
+        <div class="tm">${fmtTime(m.ts)}</div>
+      </div>`;
+    }).join('');
+    msgsBox.scrollTop = msgsBox.scrollHeight;
+    $$('[data-vote]', msgsBox).forEach(b => b.onclick = async () => {
+      const [mid, idx] = b.dataset.vote.split('|');
+      const key = state.user.memberId || state.user.email;
+      await set(ref(db, `${roomKey}/messages/${mid}/votes/${key}`), Number(idx));
+    });
+  });
+  state.unsubs.push(unsub);
+
+  async function send(payload) {
+    await set(push(ref(db, roomKey + '/messages')), {
+      uid: state.user.memberId || state.user.email,
+      name: state.user.name,
+      ts: Date.now(),
+      ...payload
+    });
+  }
+
+  $('#sendBtn', v).onclick = () => {
+    const inp = $('#msgInput', v);
+    if (!inp.value.trim()) return;
+    send({ type: 'text', text: inp.value.trim() });
+    inp.value = '';
+  };
+  $('#msgInput', v).addEventListener('keydown', e => {
+    if (e.key === 'Enter') $('#sendBtn', v).click();
+  });
+
+  $('#attachBtn', v).onclick = () => $('#fileInput', v).click();
+  $('#fileInput', v).onchange = async e => {
+    const f = e.target.files[0];
+    if (!f) return;
+    if (f.size > 900000) { toast('Файл хэт том (900KB+)', 'err'); return; }
+    const url = await fileToDataURL(f);
+    await send({
+      type: f.type.startsWith('image/') ? 'image' : 'file',
+      url, fileName: f.name, text: ''
+    });
+    e.target.value = '';
+    toast('Илгээгдлээ');
+  };
+
+  $('#pollBtn', v).onclick = () => {
+    openModal('📊 Санал асуулга', `
+      <form id="pollForm">
+        <label>Асуулт<input name="q" required></label>
+        <label>Сонголтууд (мөр тус бүрт нэг)<textarea name="opts" required>Тийм
+Үгүй
+Түтгэлзэж байна</textarea></label>
+      </form>
+    `, `
+      <button class="btn ghost" data-close>Болих</button>
+      <button class="btn primary" id="sendPoll">Илгээх</button>
+    `);
+    $('#sendPoll', modalEl).onclick = async () => {
+      const f = $('#pollForm', modalEl);
+      if (!f.reportValidity()) return;
+      const fd = new FormData(f);
+      const opts = fd.get('opts').split('\n').map(s => s.trim()).filter(Boolean);
+      if (opts.length < 2) return toast('Хамгийн багадаа 2 сонголт', 'err');
+      await send({ type: 'poll', pollQ: fd.get('q'), pollOptions: opts, votes: {} });
+      closeModal(); toast('Санал асуулга илгээгдлээ');
+    };
+  };
+};
+
+/* ================================================================
+   VIEW: NEWS
+   ================================================================ */
+views.news = async function () {
+  const v = $('#view');
+  const clubId = state.user.clubId;
+  if (!clubId) { v.innerHTML = `<div class="glass card empty">Клуб сонгоно уу.</div>`; return; }
+
+  v.innerHTML = `
+    <div class="page-head">
+      <div><h2>📰 Мэдээ</h2><p class="muted">Тэргүүнээс гишүүдэд хүргэх мэдэгдэл</p></div>
+      ${canManage() ? `<button class="btn primary" id="newNews">+ Мэдээ илгээх</button>` : ''}
+    </div>
+    <div id="newsList" class="list"></div>`;
+
+  const snap = await get(ref(db, `clubs/${clubId}/news`));
+  const list = Object.entries(snap.val() || {}).map(([id, n]) => ({ id, ...n }))
+                     .sort((a, b) => (b.ts || 0) - (a.ts || 0));
+  const box = $('#newsList', v);
+
+  box.innerHTML = list.length ? list.map(n => `
+    <div class="glass card">
+      <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap">
+        <h3 style="font-size:16px">${esc(n.title || '')}</h3>
+        <span class="badge">${fmtDate(n.ts)}</span>
+      </div>
+      <p style="margin-top:10px;font-size:14px;line-height:1.6">${esc(n.body || '').replace(/\n/g, '<br>')}</p>
+      <p class="muted small" style="margin-top:10px">— ${esc(n.author || '')}</p>
+      ${canManage() ? `<button class="btn sm danger" data-del="${n.id}" style="margin-top:10px">🗑 Устгах</button>` : ''}
+    </div>`).join('')
+    : `<div class="glass card empty">Мэдээ байхгүй.</div>`;
+
+  $$('[data-del]', box).forEach(b => b.onclick = async () => {
+    if (!confirm('Устгах уу?')) return;
+    await remove(ref(db, `clubs/${clubId}/news/${b.dataset.del}`));
+    toast('Устгагдлаа'); views.news();
+  });
+
+  if (canManage()) $('#newNews', v).onclick = () => {
+    openModal('📰 Мэдээ илгээх', `
+      <form id="newsForm">
+        <label>Гарчиг<input name="title" required></label>
+        <label>Агуулга<textarea name="body" required style="min-height:130px"></textarea></label>
+      </form>
+    `, `
+      <button class="btn ghost" data-close>Болих</button>
+      <button class="btn primary" id="saveNews">Илгээх</button>
+    `);
+    $('#saveNews', modalEl).onclick = async () => {
+      const f = $('#newsForm', modalEl);
+      if (!f.reportValidity()) return;
+      const fd = Object.fromEntries(new FormData(f));
+      await set(push(ref(db, `clubs/${clubId}/news`)), {
+        title: fd.title, body: fd.body,
+        author: state.user.name, ts: Date.now()
+      });
+      closeModal(); toast('Мэдээ илгээгдлээ'); views.news();
+    };
+  };
+};
+
+/* ================================================================
+   VIEW: PROFILE
+   ================================================================ */
+views.profile = async function () {
+  const v = $('#view');
+  const clubId = state.user.clubId;
+  const [clubS, memS] = await Promise.all([
+    clubId ? get(ref(db, 'clubs/' + clubId)) : Promise.resolve({ val: () => null }),
+    (clubId && state.user.memberId)
+      ? get(ref(db, `clubs/${clubId}/members/${state.user.memberId}`))
+      : Promise.resolve({ val: () => null })
+  ]);
+  const club = clubS.val() || {};
+  const me   = memS.val() || {};
+
+  v.innerHTML = `
+    <div class="page-head"><div><h2>👤 Профайл</h2><p class="muted">Хувийн болон клубын мэдээлэл</p></div></div>
+
+    <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(320px,1fr))">
+      <div class="glass card">
+        <h3 style="font-size:16px;margin-bottom:14px">🙋 Миний мэдээлэл</h3>
+        <form id="meForm">
+          <label>Нэр<input name="name" value="${esc(me.name || state.user.name || '')}"></label>
+          <label>Имэйл<input name="email" type="email" value="${esc(me.email || state.user.email || '')}"></label>
+          <label>Утас<input name="phone" value="${esc(me.phone || '')}"></label>
+          <label>Асран хамгаалагч<input name="guardian" value="${esc(me.guardian || '')}"></label>
+          <div class="row">
+            <label>Анги-бүлэг<input name="class" value="${esc(me.class || '')}"></label>
+            <label>Түвшин<input value="${esc(me.role || roleLabel(state.user.role))}" disabled></label>
+          </div>
+          <button class="btn primary" type="submit" style="width:100%">Хадгалах</button>
+        </form>
+      </div>
+
+      <div class="glass card">
+        <h3 style="font-size:16px;margin-bottom:14px">🏛 ХӨУБ / Клуб</h3>
+        ${clubId ? `
+        <form id="clubForm">
+          <label>Клубын нэр<input name="name" value="${esc(club.name || '')}" ${canManage() ? '' : 'disabled'}></label>
+          <label>Сургууль<input name="school" value="${esc(club.school || '')}" ${canManage() ? '' : 'disabled'}></label>
+          <label>Бүтэц<input name="structure" value="${esc(club.structure || '')}" ${canManage() ? '' : 'disabled'}></label>
+          <label>Лого (URL)<input name="logo" value="${esc(club.logo || '')}" ${canManage() ? '' : 'disabled'}></label>
+          ${canManage() ? `<button class="btn primary" type="submit" style="width:100%">Клубын мэдээлэл хадгалах</button>` : ''}
+        </form>
+        <div class="divider"></div>
+        <p class="muted small">Клубын код</p>
+        <div class="code-pill" data-copy="${esc(club.code || '')}" style="margin-top:6px">${esc(club.code || '—')} 📋</div>
+        ` : `<p class="muted small">Клуб сонгоогүй (Нийгмийн ажилтан).</p>`}
+      </div>
+    </div>`;
+
+  $$('[data-copy]', v).forEach(p => p.onclick = () => {
+    navigator.clipboard?.writeText(p.dataset.copy); toast('Хуулагдлаа');
+  });
+
+  const meForm = $('#meForm', v);
+  if (meForm) meForm.onsubmit = async e => {
+    e.preventDefault();
+    const fd = Object.fromEntries(new FormData(meForm));
+    if (clubId && state.user.memberId) {
+      await update(ref(db, `clubs/${clubId}/members/${state.user.memberId}`), fd);
+    }
+    state.user.name = fd.name; state.user.email = fd.email;
+    saveSession();
+    $('.chip').textContent = fd.name;
+    toast('Хадгалагдлаа');
+  };
+
+  const clubForm = $('#clubForm', v);
+  if (clubForm && canManage()) clubForm.onsubmit = async e => {
+    e.preventDefault();
+    const fd = Object.fromEntries(new FormData(clubForm));
+    await update(ref(db, 'clubs/' + clubId), fd);
+    toast('Клубын мэдээлэл хадгалагдлаа');
+  };
+};
+
+/* ================================================================
+   VIEW: SETTINGS
+   ================================================================ */
+views.settings = async function () {
+  const v = $('#view');
+  const th  = localStorage.getItem('mgmt_theme')  || 'dark';
+  const acc = localStorage.getItem('mgmt_accent') || '265';
+
+  v.innerHTML = `
+    <div class="page-head"><div><h2>⚙️ Тохиргоо</h2><p class="muted">Харагдац, аюулгүй байдал, эрх</p></div></div>
+
+    <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(320px,1fr))">
+      <div class="glass card">
+        <h3 style="font-size:16px;margin-bottom:14px">🎨 Харагдац</h3>
+        <label>Theme
+          <select id="themeSel">
+            <option value="dark"  ${th === 'dark'  ? 'selected' : ''}>🌙 ХАР</option>
+            <option value="light" ${th === 'light' ? 'selected' : ''}>☀️ ЦАГААН</option>
+          </select>
+        </label>
+        <label>Солонгорон өнгийн сонголт
+          <input type="range" id="accRange" min="0" max="360" value="${acc}" style="padding:0;height:34px">
+        </label>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px">
+          ${[265,200,320,20,140].map(a => `
+            <button class="btn sm" data-acc="${a}"
+              style="background:linear-gradient(135deg,hsl(${a} 90% 60%),hsl(${a+70} 90% 58%));border:none;color:#fff">
+              ●
+            </button>`).join('')}
+        </div>
+      </div>
+
+      <div class="glass card">
+        <h3 style="font-size:16px;margin-bottom:14px">🔑 Бүртгэл</h3>
+        <form id="accForm">
+          <label>Имэйл<input name="email" type="email" value="${esc(state.user.email || '')}"></label>
+          <label>Гишүүн / Клубын код
+            <input name="code" value="${esc(state.user.code || '')}" style="text-transform:uppercase">
+          </label>
+          <button class="btn primary" type="submit" style="width:100%">Солих</button>
+        </form>
+      </div>
+
+      <div class="glass card">
+        <h3 style="font-size:16px;margin-bottom:14px">🚀 Идэвхжүүлэлт</h3>
+        <p class="muted small" style="margin-bottom:10px">
+          FULL-A4 кодыг оруулбал Хүүхдийн өөрөө удирдлагын байгууллагын
+          удирдах зөвлөлийн бүтэн эрх нээгдэнэ.
+        </p>
+        <form id="actForm">
+          <label>Идэвхжүүлэх код<input name="code" placeholder="FULL-A4" style="text-transform:uppercase"></label>
+          <button class="btn primary" type="submit" style="width:100%">Идэвхжүүлэх</button>
+        </form>
+        <p class="small" style="margin-top:12px">
+          Одоогийн эрх: <span class="badge ${isAdmin() ? 'green' : 'amber'}">${roleLabel(state.user.role)}</span>
+        </p>
+      </div>
+    </div>`;
+
+  $('#themeSel', v).onchange = e => {
+    localStorage.setItem('mgmt_theme', e.target.value);
+    applyTheme();
+  };
+  $('#accRange', v).oninput = e => {
+    localStorage.setItem('mgmt_accent', e.target.value);
+    document.documentElement.style.setProperty('--accent', e.target.value);
+  };
+  $$('[data-acc]', v).forEach(b => b.onclick = () => {
+    localStorage.setItem('mgmt_accent', b.dataset.acc);
+    document.documentElement.style.setProperty('--accent', b.dataset.acc);
+    $('#accRange', v).value = b.dataset.acc;
+  });
+
+  $('#accForm', v).onsubmit = async e => {
+    e.preventDefault();
+    const fd = Object.fromEntries(new FormData(e.target));
+    const newEmail = fd.email.trim();
+    const newCode  = fd.code.trim().toUpperCase();
+    try {
+      const clubId = state.user.clubId;
+      const oldCode = state.user.code;
+
+      if (newCode !== oldCode) {
+        const exists = await get(ref(db, 'codes/' + newCode));
+        if (exists.exists()) throw new Error('Энэ код аль хэдийн ашиглагдаж байна.');
+        const oldSnap = await get(ref(db, 'codes/' + oldCode));
+        const info = oldSnap.exists() ? oldSnap.val() : { clubId, memberId: state.user.memberId, role: state.user.role };
+        await set(ref(db, 'codes/' + newCode), info);
+        await remove(ref(db, 'codes/' + oldCode));
+        if (clubId && state.user.memberId) {
+          await update(ref(db, `clubs/${clubId}/members/${state.user.memberId}`), { code: newCode });
+        }
+        state.user.code = newCode;
+      }
+      if (clubId && state.user.memberId) {
+        await update(ref(db, `clubs/${clubId}/members/${state.user.memberId}`), { email: newEmail });
+      }
+      state.user.email = newEmail;
+      saveSession();
+      toast('Амжилттай солигдлоо');
+    } catch (err) { toast(err.message, 'err'); }
+  };
+
+  $('#actForm', v).onsubmit = async e => {
+    e.preventDefault();
+    const fd = Object.fromEntries(new FormData(e.target));
+    if (fd.code.trim().toUpperCase() !== 'FULL-A4') return toast('Код буруу байна', 'err');
+    state.user.full = true;
+    state.user.role = 'admin';
+    saveSession();
+    toast('🎉 Бүтэн эрх нээгдлээ!');
+    renderApp();
+  };
+};
+
+/* ================================================================
+   VIEW: ADMIN (all clubs)
+   ================================================================ */
+views.admin = async function () {
+  const v = $('#view');
+  if (!isAdmin()) { v.innerHTML = `<div class="glass card empty">Эрх хүрэлцэхгүй.</div>`; return; }
+
+  v.innerHTML = `
+    <div class="page-head">
+      <div><h2>🏛 Бүх ХӨУБ — Удирдлага</h2><p class="muted">Бүх клуб, мэдээ илгээх, системийн тохиргоо</p></div>
+    </div>
+    <div class="glass card" style="margin-bottom:16px">
+      <h3 style="font-size:16px;margin-bottom:10px">📢 Бүх ХӨУБ-д мэдээ илгээх</h3>
+      <form id="broadcastForm">
+        <label>Гарчиг<input name="title" required></label>
+        <label>Агуулга<textarea name="body" required></textarea></label>
+        <button class="btn primary" type="submit">Бүгдэд илгээх</button>
+      </form>
+    </div>
+    <div id="adminClubs" class="grid"></div>`;
+
+  const snap = await get(ref(db, 'clubs'));
+  const clubs = snap.val() || {};
+  const box = $('#adminClubs', v);
+  const entries = Object.entries(clubs);
+  if (!entries.length) box.innerHTML = `<div class="glass card empty">Клуб байхгүй.</div>`;
+  else box.innerHTML = entries.map(([id, c]) => `
+    <div class="glass card">
+      <h3 style="font-size:16px">${esc(c.name || '—')}</h3>
+      <p class="muted small" style="margin-top:4px">${esc(c.school || '')} · ${esc(c.structure || '')}</p>
+      <p class="muted small">Тэргүүн: ${esc(c.leaderName || '—')}</p>
+      <div class="code-pill" data-copy="${esc(c.code || '')}" style="margin-top:8px">${esc(c.code || '')} 📋</div>
+      <button class="btn primary sm" data-enter="${id}" style="margin-top:10px">Нээх →</button>
+    </div>`).join('');
+
+  $$('[data-copy]', box).forEach(p => p.onclick = () => {
+    navigator.clipboard?.writeText(p.dataset.copy); toast('Хуулагдлаа');
+  });
+  $$('[data-enter]', box).forEach(b => b.onclick = () => {
+    state.user.clubId = b.dataset.enter; saveSession(); go('dashboard');
+  });
+
+  $('#broadcastForm', v).onsubmit = async e => {
+    e.preventDefault();
+    const fd = Object.fromEntries(new FormData(e.target));
+    const ids = Object.keys(clubs);
+    for (const cid of ids) {
+      await set(push(ref(db, `clubs/${cid}/news`)), {
+        title: '📢 ' + fd.title, body: fd.body,
+        author: 'Нийгмийн ажилтан', ts: Date.now()
+      });
+    }
+    e.target.reset();
+    toast('Бүх клубт мэдээ илгээгдлээ');
+  };
+};
+
+/* ================================================================
+   BOOT
+   ================================================================ */
+(function boot() {
+  const raw = localStorage.getItem('mgmt_session');
+  if (raw) {
+    try { state.user = JSON.parse(raw); } catch { state.user = null; }
+  }
+  if (state.user) {
+    renderApp();
+  } else {
+    renderAuth('login');
+  }
+})();
+</script>
+</body>
+</html>
